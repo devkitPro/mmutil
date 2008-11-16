@@ -1,0 +1,1 @@
+#define MAS_VERSION 0x18
