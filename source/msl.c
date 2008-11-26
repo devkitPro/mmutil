@@ -1,29 +1,26 @@
-/*-----------------------------------------------------------------------------------------
-Copyright (c) 2007, Mukunda Johnson
+/****************************************************************************
+ *                                                          __              *
+ *                ____ ___  ____ __  ______ ___  ____  ____/ /              *
+ *               / __ `__ \/ __ `/ |/ / __ `__ \/ __ \/ __  /               *
+ *              / / / / / / /_/ />  </ / / / / / /_/ / /_/ /                *
+ *             /_/ /_/ /_/\__,_/_/|_/_/ /_/ /_/\____/\__,_/                 *
+ *                                                                          *
+ *         Copyright (c) 2008, Mukunda Johnson (mukunda@maxmod.org)         *
+ *                                                                          *
+ * Permission to use, copy, modify, and/or distribute this software for any *
+ * purpose with or without fee is hereby granted, provided that the above   *
+ * copyright notice and this permission notice appear in all copies.        *
+ *                                                                          *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES *
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF         *
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR  *
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES   *
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN    *
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF  *
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           *
+ ****************************************************************************/
 
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    * Neither the name of the owners nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
------------------------------------------------------------------------------------------*/
-
-// MAXMOD SOLUTION
+// MAXMOD SOUNDBANK
 
 #include <stdlib.h>
 #include <string.h>
@@ -41,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "simple.h"
 #include "version.h"
 #include "systems.h"
+#include "samplefix.h"
 
 FILE*	F_SCRIPT=NULL;
 
@@ -54,14 +52,19 @@ u16		MSL_NSONGS;
 
 char	str_msl[256];
 
+#define TMP_SAMP "sampJ328G54AU3.tmp"
+#define TMP_SONG "songDJ34957FAI.tmp"
+
 void MSL_PrintDefinition( char* filename, u16 id, char* prefix );
+
+#define SAMPLE_HEADER_SIZE (12 + (( target_system == SYSTEM_NDS ) ? 4:0))
 
 void MSL_Erase( void )
 {
 	MSL_NSAMPS = 0;
 	MSL_NSONGS = 0;
-	file_delete( "samp.tmp" );
-	file_delete( "songs.tmp" );
+	file_delete( TMP_SAMP );
+	file_delete( TMP_SONG );
 }
 
 u16 MSL_AddSample( Sample* samp )
@@ -69,18 +72,22 @@ u16 MSL_AddSample( Sample* samp )
 	u32 sample_length;
 	u32 sample_looplen;
 	u32 x;
-	file_open_write_end( "samp.tmp" );
+	file_open_write_end( TMP_SAMP );
 	
 	sample_length = samp->sample_length;
 	sample_looplen = samp->loop_end-samp->loop_start;
 	
-	write32( ((samp->format & SAMPF_16BIT) ? sample_length*2 : sample_length ) + 12  +4); // +4 for sample padding
+	write32( ((samp->format & SAMPF_16BIT) ? sample_length*2 : sample_length ) + SAMPLE_HEADER_SIZE  +4); // +4 for sample padding
 	if( target_system == SYSTEM_GBA )
 		write8( 1 );
 	else
 		write8( 2 );
 	write8( MAS_VERSION );
-	write8( BYTESMASHER ); write8( BYTESMASHER );
+	if( samp->filename[0] == '#' )
+		write8( 1);
+	else
+		write8( 0);
+	write8( BYTESMASHER );
 	
 	if( target_system == SYSTEM_GBA )
 	{
@@ -89,6 +96,7 @@ u16 MSL_AddSample( Sample* samp )
 		write8( SAMP_FORMAT_U8 );//write8( BYTESMASHER );
 		write8( BYTESMASHER );
 		write16( (u16) ((samp->frequency * 1024 + (15768/2)) / 15768) );
+	//	write32( 0);
 	}
 	else
 	{
@@ -135,6 +143,7 @@ u16 MSL_AddSample( Sample* samp )
 		write8( sample_dsformat( samp ) );
 		write8( sample_dsreptype( samp ) );
 		write16( (u16) ((samp->frequency * 1024 + (32768/2)) / 32768) );
+		write32( 0);
 	}
 	
 	// write sample data
@@ -170,10 +179,20 @@ u16 MSL_AddSample( Sample* samp )
 		}
 		else
 		{
-			write8( 0 );
-			write8( 0 );
-			write8( 0 );
-			write8( 0 );
+			if( target_system == SYSTEM_GBA )
+			{
+				write8( 128 );
+				write8( 128 );
+				write8( 128 );
+				write8( 128 );
+			}
+			else
+			{
+				write8( 0 );
+				write8( 0 );
+				write8( 0 );
+				write8( 0 );
+			}
 		}
 	}
 
@@ -193,12 +212,12 @@ u16 MSL_AddSampleC( Sample* samp )
 	int samp_id;
 	bool samp_match;
 		
-	int fsize=file_size( "samp.tmp" );
+	int fsize=file_size( TMP_SAMP );
 	if( fsize == 0 )
 	{
 		return MSL_AddSample( samp );
 	}
-	F_SAMP = fopen( "samp.tmp", "rb" );
+	F_SAMP = fopen( TMP_SAMP, "rb" );
 	fseek( F_SAMP, 0, SEEK_SET );
 	samp_id = 0;
 	while( ftell( F_SAMP ) < fsize )
@@ -209,6 +228,11 @@ u16 MSL_AddSampleC( Sample* samp )
 		samp_llen = read32f( F_SAMP );
 		sformat = read8f( F_SAMP );		/////// BUG! GBA DOESNLT WRITE FORMAT!?
 		skip8f( 3, F_SAMP );
+		if( target_system == SYSTEM_NDS )
+		{
+			skip8f(4,F_SAMP);
+		}
+
 		samp_match=true;
 		if( samp->sample_length == samp_len && ( samp->loop_type ? samp->loop_end-samp->loop_start : 0xFFFFFFFF ) == samp_llen && sformat == sample_dsformat( samp ) )
 		{
@@ -242,12 +266,12 @@ u16 MSL_AddSampleC( Sample* samp )
 			}
 			else
 			{
-				skip8f( (h_filesize-12) - (st+1)  , F_SAMP );		// +4 to skip padding
+				skip8f( (h_filesize-SAMPLE_HEADER_SIZE ) - (st+1)  , F_SAMP );		// +4 to skip padding
 			}
 		}
 		else
 		{
-			skip8f( h_filesize-12  , F_SAMP ); // +4 to skip padding
+			skip8f( h_filesize- SAMPLE_HEADER_SIZE , F_SAMP ); // +4 to skip padding
 		}
 		samp_id++;
 	}
@@ -263,11 +287,12 @@ u16 MSL_AddModule( MAS_Module* mod )
 	for( x = 0; x < mod->samp_count; x++ )
 	{
 		samp_id = MSL_AddSampleC( &mod->samples[x] );
-		MSL_PrintDefinition( mod->samples[x].filename, (u16)samp_id, "SFX_" );
+		if( mod->samples[x].filename[0] == '#' )
+			MSL_PrintDefinition( mod->samples[x].filename+1, (u16)samp_id, "SFX_" );
 		mod->samples[x].msl_index = samp_id;
 	}
 	
-	file_open_write_end( "songs.tmp" );
+	file_open_write_end( TMP_SONG );
 	Write_MAS( mod, false, true );
 	file_close_write();
 	MSL_NSONGS++;
@@ -286,8 +311,14 @@ void MSL_Export( char* filename )
 	file_open_write( filename );
 	write16( MSL_NSAMPS );
 	write16( MSL_NSONGS );
-	write32( 0xbabababa );
-	write32( 0xbabababa );
+	write8( '*' );
+	write8( 'm' );
+	write8( 'a' );
+	write8( 'x' );
+	write8( 'm' );
+	write8( 'o' );
+	write8( 'd' );
+	write8( '*' );
 	
 	parap_samp = (u32*)malloc( MSL_NSAMPS * sizeof( u32 ) );
 	parap_song = (u32*)malloc( MSL_NSONGS * sizeof( u32 ) );
@@ -298,7 +329,7 @@ void MSL_Export( char* filename )
 	for( x = 0; x < MSL_NSONGS; x++ )
 		write32( 0xAAAAAAAA );
 	// copy samples
-	file_open_read( "samp.tmp" );
+	file_open_read( TMP_SAMP );
 	for( x = 0; x < MSL_NSAMPS; x++ )
 	{
 		align32();
@@ -310,7 +341,7 @@ void MSL_Export( char* filename )
 	}
 	file_close_read();
 	
-	file_open_read( "songs.tmp" );
+	file_open_read( TMP_SONG );
 	for( x = 0; x < MSL_NSONGS; x++ )
 	{
 		align32();
@@ -327,6 +358,8 @@ void MSL_Export( char* filename )
 		write32( parap_samp[x] );
 	for( x=  0; x < MSL_NSONGS; x++ )
 		write32( parap_song[x] );
+
+	file_close_write();
 
 	if( parap_samp )
 		free( parap_samp );
@@ -435,9 +468,9 @@ int MSL_Create( char* argv[], int argc, char* output, char* header, bool verbose
 //	if( !F_HEADER )
 //		return -1;	// needs header file!
 	
-	file_open_write( "samp.tmp" );
+	file_open_write( TMP_SAMP );
 	file_close_write();
-	file_open_write( "songs.tmp" );
+	file_open_write( TMP_SONG );
 	file_close_write();
 	
 	for( x = 1; x < argc; x++ )
@@ -463,7 +496,7 @@ int MSL_Create( char* argv[], int argc, char* output, char* header, bool verbose
 		F_HEADER=NULL;
 	}
 
-	file_delete( "samp.tmp" );
-	file_delete( "songs.tmp" );
+	file_delete( TMP_SAMP );
+	file_delete( TMP_SONG );
 	return ERR_NONE;
 }

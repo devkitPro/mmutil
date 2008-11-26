@@ -1,27 +1,24 @@
-/*-----------------------------------------------------------------------------------------
-Copyright (c) 2007, Mukunda Johnson
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    * Neither the name of the owners nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-		
------------------------------------------------------------------------------------------*/
+/****************************************************************************
+ *                                                          __              *
+ *                ____ ___  ____ __  ______ ___  ____  ____/ /              *
+ *               / __ `__ \/ __ `/ |/ / __ `__ \/ __ \/ __  /               *
+ *              / / / / / / /_/ />  </ / / / / / /_/ / /_/ /                *
+ *             /_/ /_/ /_/\__,_/_/|_/_/ /_/ /_/\____/\__,_/                 *
+ *                                                                          *
+ *         Copyright (c) 2008, Mukunda Johnson (mukunda@maxmod.org)         *
+ *                                                                          *
+ * Permission to use, copy, modify, and/or distribute this software for any *
+ * purpose with or without fee is hereby granted, provided that the above   *
+ * copyright notice and this permission notice appear in all copies.        *
+ *                                                                          *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES *
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF         *
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR  *
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES   *
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN    *
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF  *
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           *
+ ****************************************************************************/
 
 // this is
 // VERSION 1.8d
@@ -55,25 +52,7 @@ int PANNING_SEP;
 int number_of_inputs;
 
 #ifdef SUPER_ASCII
-/*#define USAGE "\
-ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»\n\
-º MAXMOD UTILITY v1.8d \x02 º\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄĞÄÄÄÄÄ·\n\
-º Usage: mutil [options] input º\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶\n\
-º  \x0e Supports MOD/S3M/XM/IT \x0e  º\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄĞÄÄÄÄÄÄ·\n\
-º Option     ³ Description            º\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶\n\
-º -d         ³ NDS Mode               º\n\
-º -b         ³ ROM output (GBA/NDS)   º\n\
-º -m         ³ MAS output             º\n\
-º -i         ³ Ignore sample flags    º\n\
-º -p<0-9>    ³ Set panning separation º\n\
-º -v         ³ Verbose output         º\n\
-º -o<output> ³ Specify output file    º\n\
-º -h<header> ³ Specify header file    º\n\
-ÈÍÍÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼\n"*/
+
 #define USAGE "\
 \n\
 ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»       ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»\n\
@@ -83,9 +62,9 @@ int number_of_inputs;
 ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶°ÓÄÄÄÄÄÄÒÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶°°\n\
 º  \xe Supports MOD/S3M/XM/IT \xe  º°°°°°°°°º                       º°°\n\
 ÇÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄĞÄÄÄÄÄÄ·°º This utility is dis-  º°°\n\
-º Option     ³ Description            º°º tributed under a BSD  º°°\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶°º license. See COPYING  º°°\n\
-º -d         ³ NDS Mode               º°º for terms of use.     º°°\n\
+º Option     ³ Description            º°º tributed under the    º°°\n\
+ÇÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶°º ISC license. See      º°°\n\
+º -d         ³ NDS Mode               º°º COPYING for terms     º°°\n\
 º -b         ³ ROM output (GBA/NDS)   º°º                       º°°\n\
 º -m         ³ MAS output             º°º Source code is avail- º°°\n\
 º -i         ³ Ignore sample flags    º°º able with the Maxmod  º°°\n\
@@ -99,19 +78,27 @@ int number_of_inputs;
 
 #else
 #define USAGE "\
-MAXMOD UTILITY v1.8d\n\
-Usage: mutil [options] input\n\
-  Supports MOD/S3M/XM/IT\n\
-  \n\
-  Options\n\
-  -d		 NDS Mode\n\
-  -b		 ROM output (GBA/NDS)\n\
-  -m		 MAS output\n\
-  -i		 Ignore sample flags\n\
-  -p<0-9>	 Set default panning separation (used in mod/s3m)\n\
-  -v		 Verbose output\n\
-  -o<output>	 Specify output file\n\
-  -h<header>	 Specify header file\n"
+\n\
+.--------------------------.     .-------------------------------.\n\
+| Maxmod Utility v1.8d *** |::   |                               |::\n\
+|------------------------------. |   (C) 2008 Mukunda Johnson    |::\n\
+| Usage: mmutil [option] input |:|                               |::\n\
+|------------------------------|:`-------------------------------|::\n\
+|  * Supports MOD/S3M/XM/IT *  |::::::::|                        |::\n\
+|-------------------------------------.:| This utility is dis-   |::\n\
+| Option     | Description            |:| tributed under the ISC |::\n\
+|-------------------------------------|:| license. See COPYING   |::\n\
+| -d         | NDS Mode               |:| for terms of use.      |::\n\
+| -b         | ROM output (GBA/NDS)   |:|                        |::\n\
+| -m         | MAS output             |:| Source code is avail-  |::\n\
+| -i         | Ignore sample flags    |:| able with the Maxmod   |::\n\
+| -p<0-9>    | Set panning separation |:| distribution.          |::\n\
+| -v         | Verbose output         |:|                        |::\n\
+| -o<output> | Specify output file    |:|    www.maxmod.org      |::\n\
+| -h<header> | Specify header file    |:|                        |::\n\
+`-------------------------------------':`------------------------'::\n\
+  ::::::::::::::::::::::::::::::::::::::: ::::::::::::::::::::::::::\n\
+"
 
 #endif
 
@@ -156,7 +143,9 @@ int GetYesNo( void )
 	return c == 'y' ? 1 : 0;
 }
 
+//------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[])
+//------------------------------------------------------------------------------------------------
 {
 	char* str_input=NULL;
 	char* str_output=NULL;
@@ -184,19 +173,23 @@ int main(int argc, char* argv[])
 	number_of_inputs=0;
 
 	PANNING_SEP = 128;
+
+	//------------------------------------------------------------------------
+	// parse arguments
+	//------------------------------------------------------------------------
 	
 	for( a = 1; a < argc; a++ )
 	{
 		if( argv[a][0] == '-' )
 		{
 			if( argv[a][1] == 'b' )
-				g_flag=true;
+				g_flag = true;
 			else if( argv[a][1] == 'v' )
-				v_flag=true;
+				v_flag = true;
 			else if( argv[a][1] == 'd' )
 				target_system = SYSTEM_NDS;
 			else if( argv[a][1] == 'i' )
-				ignore_sflags=true;
+				ignore_sflags = true;
 			else if( argv[a][1] == 'p' )
 				PANNING_SEP = ((argv[a][2] - '0') * 256)/9;
 			else if( argv[a][1] == 'o' )
@@ -204,9 +197,9 @@ int main(int argc, char* argv[])
 			else if( argv[a][1] == 'h' )
 				str_header = argv[a]+2;
 			else if( argv[a][1] == 'm' )
-				m_flag=true;
+				m_flag = true;
 			else if( argv[a][1] == 'z' )
-				z_flag=true;
+				z_flag = true;
 		}
 		else if( !str_input )
 		{
@@ -222,7 +215,6 @@ int main(int argc, char* argv[])
 	if( z_flag )
 	{
 		kiwi_start();
-		
 	}
 	
 	if( number_of_inputs==0 )
@@ -231,16 +223,27 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	if( m_flag || g_flag )
+	if( m_flag & g_flag )
 	{
-		if( number_of_inputs != 1 )
+		printf("-m and -g cannot be combined.\n");
+		return -1;
+	}
+	
+	if( m_flag && number_of_inputs != 1 )
+	{
+		printf( "-m only supports one input.\n" );
+		return -1;
+	}
+
+	//---------------------------------------------------------------------------
+	// m/g generate output target if not given
+	//---------------------------------------------------------------------------
+
+	if( m_flag || g_flag)
+	{
+		if( !str_output )
 		{
-			printf( "Too much input! Only one file is allowed in this mode.\n" );
-			return -1;
-		}
-		else
-		{
-			if( !str_output )
+			if( number_of_inputs == 1 )
 			{
 				if( strlen(str_input) < 4 )
 				{
@@ -290,38 +293,37 @@ int main(int argc, char* argv[])
 				}
 				str_output[strpi++] = 0;
 			}
-		}
-	}
-	else
-	{
-		if( !str_output )
-		{
-			printf( "No output file! (-o option)\n" );
-			return -1;
+			else
+			{
+				printf( "No output file! (-o option)\n" );
+				return -1;
+			}
 		}
 	}
 	
-	// check the extension of the filename
+	// catch filename too small
 	strl=strlen(str_input);
 	if( strl < 4 )
 	{
 		print_error( ERR_BADINPUT );
 		return -1;
 	}
-	input_type = get_ext( str_input );
-	
-	if( g_flag || m_flag )
+
+	if( m_flag )
 	{
+		input_type = get_ext(str_input);
 		if( file_open_read( str_input ) )
 		{
 			// file not found
 			print_error( ERR_NOINPUT );
 			return -1;
 		}
-		
+
 		switch( input_type )
 		{
+		//------------------------------------------------------
 		case INPUT_TYPE_MOD:
+		//------------------------------------------------------
 			if( Load_MOD( &mod, v_flag ) )
 			{
 				print_error( ERR_INVALID_MODULE );
@@ -329,7 +331,9 @@ int main(int argc, char* argv[])
 				return -1;
 			}
 			break;
+		//------------------------------------------------------
 		case INPUT_TYPE_S3M:
+		//------------------------------------------------------
 			if( Load_S3M( &mod, v_flag ) )
 			{
 				print_error( ERR_INVALID_MODULE );
@@ -337,7 +341,9 @@ int main(int argc, char* argv[])
 				return -1;
 			}
 			break;
+		//------------------------------------------------------
 		case INPUT_TYPE_XM:
+		//------------------------------------------------------
 			if( Load_XM( &mod, v_flag ) )
 			{
 				print_error( ERR_INVALID_MODULE );
@@ -345,7 +351,9 @@ int main(int argc, char* argv[])
 				return -1;
 			}
 			break;
+		//------------------------------------------------------
 		case INPUT_TYPE_IT:
+		//------------------------------------------------------
 			if( Load_IT( &mod, v_flag ) )
 			{
 				// ERROR!
@@ -354,13 +362,10 @@ int main(int argc, char* argv[])
 				return -1;
 			}
 			break;
-		case INPUT_TYPE_WAV:
-			// ...
-			break;
 		}
 		
 		file_close_read();
-		
+
 		if( file_exists( str_output ) )
 		{
 			printf( "Output file exists! Overwrite? (y/n) " );
@@ -371,81 +376,101 @@ int main(int argc, char* argv[])
 			}
 			
 		}
-		
+
 		if( file_open_write( str_output ) )
 		{
 			print_error( ERR_NOWRITE );
 			return -1;
 		}
 
-		if( g_flag )
-		{
-			if( target_system == SYSTEM_GBA )
-			{
-				if( v_flag )
-					printf( "Writing .GBA.......\n" );
-				Write_GBA();
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-			}
-			else if( target_system == SYSTEM_NDS )
-			{
-				if( v_flag )
-					printf( "Writing .NDS.......\n" );
-				Write_NDS();
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-				write32(BYTESMASHER);
-			}
-		}
-		else
-		{
-			printf( "Writing .MAS...........\n" );
-		}
+		printf( "Writing .mas............\n" );
 
 		// output MAS
 		output_size = Write_MAS( &mod, v_flag, false );
+
 		
 		file_close_write();
 
-		if( g_flag && target_system == SYSTEM_NDS )
-			Validate_NDS( str_output, output_size );
-
 		Delete_Module( &mod );
+
 		if( v_flag )
 		{
 #ifdef SUPER_ASCII
-			printf( "Success! \x02 " );
+			printf( "Success! \x02 \n" );
 #else
-			printf( "Success! :) " );
+			printf( "Success! :) \n" );
 #endif
+		}
+	}
+	else if( g_flag )
+	{
+		int i;
+
+		MSL_Create( argv, argc, "tempSH308GK.bin", 0, v_flag );
+
+		if( file_exists( str_output ) )
+		{
+			printf( "Output file exists! Overwrite? (y/n) " );
+			if( !GetYesNo() )
+			{
+				printf( "Operation Canceled!\n" );
+				return -1;
+			}
+			
+		}
+
+		if( file_open_write( str_output ) )
+		{
+			print_error( ERR_NOWRITE );
+			return -1;
+		}
+
+		if( target_system == SYSTEM_GBA )
+		{
+			if( v_flag )
+				printf( "Making GBA ROM.......\n" );
+			Write_GBA();
+		}
+		else if( target_system == SYSTEM_NDS )
+		{
+			if( v_flag )
+				printf( "Making NDS ROM.......\n" );
+			Write_NDS();
+		}
+
+		output_size = file_size( "tempSH308GK.bin" );
+		file_open_read( "tempSH308GK.bin" );
+
+		if( target_system == SYSTEM_GBA )
+		{
+			write32( (output_size < 248832) ? 1 : 0 );
+		}
+
+		for( i = 0; i < output_size; i++ )
+		{
+			write8( read8() );
+		}
+
+		file_close_read();
+		file_close_write();
+		
+		file_delete( "tempSH308GK.bin" );
+
+		if( g_flag && target_system == SYSTEM_NDS )
+			Validate_NDS( str_output, output_size );
+		
+		if( v_flag )
+		{
+			printf( "Success! :D\n" );
+
 			if( g_flag && target_system == SYSTEM_GBA )
 			{
 				if( output_size < 262144 )
 				{
-					printf("ROM can be multibooted!\n" );
-				}
-				else
-				{
-					printf( "\n" );
+					printf("ROM can be multibooted!!\n" );
 				}
 			}
-			else
-			{
-				printf( "\n");
-			}
-		}
+		}	
 	}
 	else
 	{
