@@ -21,7 +21,7 @@
  ****************************************************************************/
 
 // this is
-// VERSION 1.8d
+// VERSION 1.8e
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,7 +56,7 @@ int number_of_inputs;
 #define USAGE "\
 \n\
 ษออออออออออออออออออออออออป       ษออออออออออออออออออออออออออออออป\n\
-บ Maxmod Utility v1.8d \x2 บฐฐ     บ                              บฐฐ\n\
+บ Maxmod Utility v1.8e \x2 บฐฐ     บ                              บฐฐ\n\
 วฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤะฤฤฤฤฤท บ   (C) 2008 Mukunda Johnson   บฐฐ\n\
 บ Usage: mmutil [option] input บฐบ                              บฐฐ\n\
 วฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤถฐำฤฤฤฤฤฤาฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤถฐฐ\n\
