@@ -51,13 +51,13 @@
 #define vstr_it_div "--------------------------------------------\n"
 #define vstr_it_instr_top   vstr_it_div
 #define vstr_it_instr_head  " INDEX VOLUME  NNA   ENV   NAME\n"
-#define vstr_it_instr_slice ""
+//#define vstr_it_instr_slice ""
 #define vstr_it_instr		" %-3i   %3i%%    %3s   %s%s%s   %-26s \n"
 #define vstr_it_instr_bottom vstr_it_div
 
 #define vstr_it_samp_top    vstr_it_div
 #define vstr_it_samp_head   " INDEX VOLUME DVOLUME LOOP   MID-C     NAME            \n"
-#define vstr_it_samp_slice  ""
+//#define vstr_it_samp_slice  ""
 #define vstr_it_samp		" %-3i   %3i%%   %3i%%    %4s  %6ihz   %-26s \n"
 #define vstr_it_samp_bottom vstr_it_div
 
@@ -548,7 +548,9 @@ int Load_IT( MAS_Module* itm, bool verbose )
 			printf( "Loading Instruments...\n" );
 			printf( vstr_it_instr_top );
 			printf( vstr_it_instr_head );
+#ifdef vstr_it_instr_slice
 			printf( vstr_it_instr_slice );
+#endif
 			//printf( "INDEX	VOLUME	NNA	ENV	NAME\n" );
 		}
 		
@@ -572,7 +574,9 @@ int Load_IT( MAS_Module* itm, bool verbose )
 		printf( "Loading Samples...\n" );
 		printf( vstr_it_samp_top );
 		printf( vstr_it_samp_head );
+#ifdef vstr_it_samp_slice
 		printf( vstr_it_samp_slice );
+#endif
 		//printf( "INDEX	VOLUME	DVOLUME	LOOP	MID-C	NAME\n" );
 	}
 	

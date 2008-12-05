@@ -284,7 +284,7 @@ int Load_XM_Instrument( Instrument* inst, MAS_Module* mas, u8* p_nextsample, boo
 	{
 		file_seek_read( inst_headstart+inst_size, SEEK_SET );
 		if( verbose )
-			printf( vstr_xm_nosamp, "-", "-", inst->name );
+			printf( vstr_xm_nosamp, inst->name );
 	}
 	
 	return ERR_NONE;

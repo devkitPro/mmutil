@@ -51,56 +51,48 @@ int PANNING_SEP;
 
 int number_of_inputs;
 
-#ifdef SUPER_ASCII
-
-#define USAGE "\
+#define USAGE "\n\
+************************\n\
+* Maxmod Utility v1.8e *\n\
+************************\n\
 \n\
-ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»       ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»\n\
-º Maxmod Utility v1.8e \x2 º°°     º                              º°°\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄĞÄÄÄÄÄ· º   (C) 2008 Mukunda Johnson   º°°\n\
-º Usage: mmutil [option] input º°º                              º°°\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶°ÓÄÄÄÄÄÄÒÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶°°\n\
-º  \xe Supports MOD/S3M/XM/IT \xe  º°°°°°°°°º                       º°°\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄĞÄÄÄÄÄÄ·°º This utility is dis-  º°°\n\
-º Option     ³ Description            º°º tributed under the    º°°\n\
-ÇÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶°º ISC license. See      º°°\n\
-º -d         ³ NDS Mode               º°º COPYING for terms     º°°\n\
-º -b         ³ ROM output (GBA/NDS)   º°º                       º°°\n\
-º -m         ³ MAS output             º°º Source code is avail- º°°\n\
-º -i         ³ Ignore sample flags    º°º able with the Maxmod  º°°\n\
-º -p<0-9>    ³ Set panning separation º°º distribution.         º°°\n\
-º -v         ³ Verbose output         º°º                       º°°\n\
-º -o<output> ³ Specify output file    º°º    www.maxmod.org     º°°\n\
-º -h<header> ³ Specify header file    º°º                       º°°\n\
-ÈÍÍÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼°ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼°°\n\
-  °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°° °°°°°°°°°°°°°°°°°°°°°°°°°\n\
-\n"
-
-#else
-#define USAGE "\
+Usage:\n\
+  mmutil [options] input files ...\n\
 \n\
-.--------------------------.     .-------------------------------.\n\
-| Maxmod Utility v1.8d *** |::   |                               |::\n\
-|------------------------------. |   (C) 2008 Mukunda Johnson    |::\n\
-| Usage: mmutil [option] input |:|                               |::\n\
-|------------------------------|:`-------------------------------|::\n\
-|  * Supports MOD/S3M/XM/IT *  |::::::::|                        |::\n\
-|-------------------------------------.:| This utility is dis-   |::\n\
-| Option     | Description            |:| tributed under the ISC |::\n\
-|-------------------------------------|:| license. See COPYING   |::\n\
-| -d         | NDS Mode               |:| for terms of use.      |::\n\
-| -b         | ROM output (GBA/NDS)   |:|                        |::\n\
-| -m         | MAS output             |:| Source code is avail-  |::\n\
-| -i         | Ignore sample flags    |:| able with the Maxmod   |::\n\
-| -p<0-9>    | Set panning separation |:| distribution.          |::\n\
-| -v         | Verbose output         |:|                        |::\n\
-| -o<output> | Specify output file    |:|    www.maxmod.org      |::\n\
-| -h<header> | Specify header file    |:|                        |::\n\
-`-------------------------------------':`------------------------'::\n\
-  ::::::::::::::::::::::::::::::::::::::: ::::::::::::::::::::::::::\n\
+ Input may be MOD, S3M, XM, IT, and/or WAV\n\
+\n\
+.------------.----------------------------------------------------.\n\
+| Option     | Description                                        |\n\
+|------------|----------------------------------------------------|\n\
+| -o<output> | Set output file.                                   |\n\
+| -h<header> | Set header output file.                            |\n\
+| -m         | Output MAS file rather than soundbank.             |\n\
+| -d         | Use for NDS projects.                              |\n\
+| -b         | Create test ROM. (use -d for .nds, otherwise .gba) |\n\
+| -i         | Ignore sample flags.                               |\n\
+| -v         | Enable verbose output.                             |\n\
+| -p         | Set initial panning separation for MOD/S3M.        |\n\
+`-----------------------------------------------------------------'\n\
+\n\
+.-----------------------------------------------------------------.\n\
+| Examples:                                                       |\n\
+|-----------------------------------------------------------------|\n\
+| Create DS soundbank file (soundbank.bin) from input1.xm         |\n\
+| and input2.it Also output header file (soundbank.h)             |\n\
+|                                                                 |\n\
+| mmutil -d input1.xm input2.it -osoundbank.bin -hsoundbank.h     |\n\
+|-----------------------------------------------------------------|\n\
+| Create test GBA ROM from two inputs                             |\n\
+|                                                                 |\n\
+| mmutil -b input1.mod input2.s3m -oTEST.gba                      |\n\
+|-----------------------------------------------------------------|\n\
+| Create test NDS ROM from three inputs                           |\n\
+|                                                                 |\n\
+| mmutil -d -b input1.xm input2.s3m testsound.wav                 |\n\
+`-----------------------------------------------------------------'\n\
+ www.maxmod.org\n\
 "
 
-#endif
 
 void print_usage( void )
 {

@@ -50,7 +50,7 @@
 #define vstr_s3m_div "--------------------------------------------\n"
 #define vstr_s3m_sampt_top  vstr_s3m_div
 #define vstr_s3m_sampt_mid   " INDEX LENGTH  LOOP  VOLUME  MID-C   NAME\n"
-#define vstr_s3m_sampt_slice "" 
+//#define vstr_s3m_sampt_slice "" 
 #define vstr_s3m_sampt_index " %-2i    "
 #define vstr_s3m_sampt_bottom vstr_s3m_div
 #define vstr_s3m_pattern " * %2i%s"
@@ -384,7 +384,9 @@ int Load_S3M( MAS_Module* mod, bool verbose )
 		printf( "Loading Samples...\n" );
 		printf( vstr_s3m_sampt_top );
 		printf( vstr_s3m_sampt_mid );
+#ifdef vstr_s3m_sampt_slice
 		printf( vstr_s3m_sampt_slice );
+#endif
 	}
 	// load instruments
 	for( x = 0; x < mod->inst_count; x++ )

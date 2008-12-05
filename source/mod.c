@@ -46,7 +46,7 @@
 #define vstr_mod_div "--------------------------------------------\n"
 #define vstr_mod_samp_top		vstr_mod_div
 #define vstr_mod_samp_header	" INDEX LENGTH LOOP  VOLUME  MID-C   NAME                   \n"
-#define vstr_mod_samp_slice		""
+//#define vstr_mod_samp_slice		""
 #define vstr_mod_samp			" %-2i    %-5i  %-3s   %3i%%    %ihz  %-22s \n"
 #define vstr_mod_samp_bottom	vstr_mod_div
 #define vstr_mod_pattern " * %2i%s"
@@ -316,7 +316,9 @@ int Load_MOD( MAS_Module* mod, bool verbose )
 		printf( "Loading Samples...\n" );
 		printf( vstr_mod_samp_top );
 		printf( vstr_mod_samp_header );
+#ifdef vstr_mod_samp_slice
 		printf( vstr_mod_samp_slice );
+#endif
 	}
 	// Load Sample Information
 	for( x = 0; x < 31; x++ )
