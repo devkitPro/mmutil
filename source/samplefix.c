@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "defs.h"
 #include "mas.h"
 #include "errors.h"
@@ -177,76 +178,111 @@ void Unroll_BIDI_Sample( Sample* samp )
 
 void Resample( Sample* samp, u32 newsize )
 {
+	// output pointers
+	u8	*dst8 =0;
+	u16	*dst16=0;
+	u8	*src8 = (u8*)samp->data;
+	u16	*src16 = (u16*)samp->data;
 	
-	u8* new_data8 = NULL;
-	u16* new_data16 = NULL;
-	u32 oldsize = samp->sample_length;
-	u32 i;
+	int oldlength = samp->sample_length;
+	int lpoint = samp->loop_start;
+	int i;
+	
 	bool bit16 = samp->format & SAMPF_16BIT;
+	double sign_diff;
 	
+	// allocate memory
 	if( bit16 )
-		new_data16 = (u16*)malloc(newsize*2);
+	{
+		dst16 = (u16*)malloc(newsize*2);
+		sign_diff = 32768.0;
+	}
 	else
-		new_data8 = (u8*)malloc(newsize);
+	{
+		dst8 = (u8*)malloc(newsize);
+		sign_diff = 128.0;
+	}
+		
+	double tscale = (double)oldlength / (double)newsize;
+	double posf;
 	
-	for( i=0; i<newsize ; i++ ) {
+	for( i = 0; i < newsize; i++ )
+	{
+		posf = (double)i * tscale;
+		int posi = (int)floor(posf);
 		
-		float pos=(float)i*(float)oldsize/(float)newsize;
-		u32 posi=(u32)pos;
-		float mu=pos-(float)posi;
-		float mu2,a0,a1,a2,a3,res;
-		float y0,y1,y2,y3;
+		double mu = posf - (double)posi;
+		double s0, s1, s2, s3;
+		double mu2, a0, a1, a2, a3, res;
 		
+		// get previous, current, next, and after next samples
 		if( bit16 )
 		{
-			y0=(posi-1)<0?0:		((float)((u16*)samp->data)[posi-1])	-32768;	// sign data
-			y1=						((float)((u16*)samp->data)[posi])	-32768;
-			y2=(posi+1)>=oldsize?0:	((float)((u16*)samp->data)[posi+1])	-32768;
-			y3=(posi+2)>=oldsize?0:	((float)((u16*)samp->data)[posi+2])	-32768;
+			s0 = (posi-1) < 0 ? 0 :		((double)(src16[posi-1]));
+			s1 =							((double)(src16[posi  ]));
+			s2 = (posi+1) >= oldlength ? 
+									(samp->loop_type ? 
+										((double)(src16[lpoint + (posi + 1 - oldlength)])) : 0) : 
+										((double)(src16[posi+1]));
+			s3 = (posi+1) >= oldlength ? 
+									(samp->loop_type ? 
+										((double)(src16[lpoint + (posi + 2 - oldlength)])) : 0) : 
+										((double)(src16[posi+2]));
 		}
 		else
 		{
-			y0=(posi-1)<0?0:		((float)((u8*)samp->data)[posi-1])	-128;	// sign data
-			y1=						((float)((u8*)samp->data)[posi])	-128;
-			y2=(posi+1)>=oldsize?0:	((float)((u8*)samp->data)[posi+1])	-128;
-			y3=(posi+2)>=oldsize?0:	((float)((u8*)samp->data)[posi+2])	-128;
+			s0 = (posi-1) < 0 ? 0 :		((double)(src8[posi-1]));
+			s1 =							((double)(src8[posi  ]));
+			s2 = (posi+1) >= oldlength ? 
+									(samp->loop_type ? 
+										((double)(src8[lpoint + (posi + 1 - oldlength)])) : 0) : 
+										((double)(src8[posi+1]));
+			s3 = (posi+1) >= oldlength ? 
+									(samp->loop_type ? 
+										((double)(src8[lpoint + (posi + 2 - oldlength)])) : 0) : 
+										((double)(src8[posi+2]));
 		}
 		
-		mu2 = mu*mu;
-		a0 = y3 - y2 - y0 + y1;
-		a1 = y0 - y1 - a0;
-		a2 = y2 - y0;
-		a3 = y1;
+		// sign data
+		s0 -= sign_diff;
+		s1 -= sign_diff;
+		s2 -= sign_diff;
+		s3 -= sign_diff;
 		
-		res=(a0*mu*mu2+a1*mu2+a2*mu+a3);
+		mu2 = mu * mu;
+		a0 = s3 - s2 - s0 + s1;
+		a1 = s0 - s1 - a0;
+		a2 = s2 - s0;
+		a3 = s1;
+		
+		res = a0*mu*mu2 + a1*mu2 + a2*mu + a3;
+		int resi = ((int)floor(res+0.5)) + sign_diff;
+		
 		if( bit16 )
 		{
-			if (res<-32768)
-				res=-32768;
-			if (res>32767)
-				res=32767;
-			new_data16[i] = (int)res+32768;	// unsign data
+			if( resi < 0 ) res = 0;
+			if( resi > 65535 ) res = 65535;
+			dst16[i] = resi;
 		}
 		else
 		{
-			if (res<-128)
-				res=-128;
-			if (res>127)
-				res=127;
-			new_data8[i] = (int)res+128;	// unsign data
+			if( resi < -128 ) resi = -128;
+			if( resi > 127 ) resi = 127;
+			dst8[i] = resi;
 		}
+		
 	}
 	
 	free( samp->data );
 	if( bit16 )
-		samp->data = (void*)new_data16;
+		samp->data = (void*)dst16;
 	else
-		samp->data = (void*)new_data8;
+		samp->data = (void*)dst8;
 	
 	samp->sample_length = newsize;
 	samp->loop_end = newsize;
-	samp->loop_start = (int)(((double)samp->loop_start * (double)newsize+((double)oldsize/2))/(double)oldsize);
-	samp->frequency = (int)(((double)samp->frequency * (double)newsize+((double)oldsize/2))/(double)oldsize);
+	samp->loop_start = (int)(((double)samp->loop_start * (double)newsize+((double)oldlength/2))/(double)oldlength);
+	samp->frequency = (int)(((double)samp->frequency * (double)newsize+((double)oldlength/2))/(double)oldlength);
 }
 
 void Sample_8bit( Sample* samp )
