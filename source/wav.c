@@ -31,7 +31,7 @@
 #include "simple.h"
 #include "samplefix.h"
 
-int Load_WAV( Sample* samp, bool verbose )
+int Load_WAV( Sample* samp, bool verbose, bool fix )
 {
 	unsigned int file_size;
 	unsigned int bit_depth = 8;
@@ -205,7 +205,7 @@ int Load_WAV( Sample* samp, bool verbose )
 	
 	if( hasformat && hasdata )
 	{
-		FixSample( samp );
+		if( fix ) FixSample( samp );
 		return LOADWAV_OK;
 	}
 	else

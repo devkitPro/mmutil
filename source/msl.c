@@ -437,7 +437,8 @@ void MSL_LoadFile( char* filename, bool verbose )
 		Delete_Module( &mod );
 		break;
 	case INPUT_TYPE_WAV:
-		Load_WAV( &wav, verbose );
+		Load_WAV( &wav, verbose, true );
+		wav.filename[0] = '#';	// set SFX flag (for demo)
 		MSL_PrintDefinition( filename, MSL_AddSample( &wav ), "SFX_" );
 		free( wav.data );
 		break;

@@ -30,6 +30,6 @@
 #define LOADWAV_UNSUPPORTED_BD	0x13
 #define LOADWAV_BADDATA			0x14
 
-int Load_WAV( Sample* samp, bool verbose );
+int Load_WAV( Sample* samp, bool verbose, bool fix );
 
 #endif

@@ -41,6 +41,8 @@
 #include "simple.h"
 #include "msl.h"
 #include "systems.h"
+#include "wav.h"
+#include "samplefix.h"
 
 extern void kiwi_start(void);
 
@@ -92,7 +94,6 @@ Usage:\n\
 `-----------------------------------------------------------------'\n\
  www.maxmod.org\n\
 "
-
 
 void print_usage( void )
 {
@@ -147,7 +148,7 @@ int main(int argc, char* argv[])
 
 	int strl;
 
-	int input_type;
+	int input_type=0;
 
 	int strp;
 	int strpi;
@@ -203,15 +204,36 @@ int main(int argc, char* argv[])
 			number_of_inputs++;
 		}
 	}
-
-	if( z_flag )
-	{
-		kiwi_start();
-	}
 	
 	if( number_of_inputs==0 )
 	{
 		print_usage();
+		return 0;
+	}
+	
+	if( z_flag )
+	{
+		kiwi_start();
+		file_open_read( str_input );
+		Sample s;
+		
+		Load_WAV( &s, false,false );
+		
+		s.name[0] = '%';
+		s.name[1] = 'c';
+		s.name[2] = 0;
+		
+		FixSample( &s );
+		
+		file_close_read();
+		file_open_write( str_output );
+		
+		int i;
+		for( i = 0; i < s.sample_length; i++ )
+			write8( ((u8*)s.data)[i] );
+		
+		file_close_write();
+		printf("okay\n");
 		return 0;
 	}
 
@@ -303,13 +325,7 @@ int main(int argc, char* argv[])
 
 	if( m_flag )
 	{
-		input_type = get_ext(str_input);
-		if( file_open_read( str_input ) )
-		{
-			// file not found
-			print_error( ERR_NOINPUT );
-			return -1;
-		}
+		
 
 		switch( input_type )
 		{
