@@ -256,19 +256,19 @@ void Resample( Sample* samp, u32 newsize )
 		a3 = s1;
 		
 		res = a0*mu*mu2 + a1*mu2 + a2*mu + a3;
-		int resi = ((int)floor(res+0.5)) + sign_diff;
+		int resi = ((int)floor(res+0.5));
 		
 		if( bit16 )
 		{
-			if( resi < 0 ) res = 0;
-			if( resi > 65535 ) res = 65535;
-			dst16[i] = resi;
+			if( resi < -32768 ) resi = -32768;
+			if( resi > 32767 ) resi = 32767;
+			dst16[i] = resi + 32768;
 		}
 		else
 		{
 			if( resi < -128 ) resi = -128;
 			if( resi > 127 ) resi = 127;
-			dst8[i] = resi;
+			dst8[i] = resi + 128;
 		}
 		
 	}
