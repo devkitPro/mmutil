@@ -105,6 +105,15 @@ int file_tell_write( void )
 	return ftell( fout );
 }
 
+int file_tell_size( void )
+{
+	int pos = ftell(fin);
+	fseek( fin, 0, SEEK_END );
+	int size = ftell(fin);
+	fseek(fin, pos, SEEK_SET );
+	return size;
+}
+
 u8 read8( void )
 {
 	u8 a;

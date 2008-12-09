@@ -59,6 +59,8 @@ bool file_exists( char* filename );
 
 int file_get_byte_count();
 
+int file_tell_size( void );
+
 #define FILE_OPEN_OKAY 0
 #define FILE_OPEN_ERROR -1
 

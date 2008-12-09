@@ -47,8 +47,10 @@ int Load_WAV( Sample* samp, bool verbose, bool fix )
 	// initialize data
 	memset( samp, 0, sizeof( Sample ) );
 	
+	file_size = file_tell_size();
+	
 	read32();						// "RIFF"
-	file_size = read32() + 8;
+	read32();						// filesize-8
 	read32();						// "WAVE"
 	
 	while( 1 )
@@ -124,6 +126,12 @@ int Load_WAV( Sample* samp, bool verbose, bool fix )
 			
 			if( verbose )
 				printf( "Loading Sample Data...\n" );
+			
+			// clip chunk size against end of file (for some borked wavs...)
+			{
+				int br = file_size - file_tell_read();
+				chunk_size = chunk_size > br ? br : chunk_size;
+			}
 			
 			samp->sample_length = chunk_size / (bit_depth/8) / num_channels;
 			samp->data = malloc( chunk_size );
