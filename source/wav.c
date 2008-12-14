@@ -197,6 +197,21 @@ int Load_WAV( Sample* samp, bool verbose, bool fix )
 					samp->loop_start = read32();
 					samp->loop_end = read32();
 					
+					// clip loop start against sample length
+					if( samp->loop_end > samp->sample_length ) {
+						samp->loop_end = samp->sample_length;
+					}
+					
+					// disable tiny loop
+					// catch invalid loop
+					if( (samp->loop_start > samp->sample_length) ||
+						(samp->loop_end - samp->loop_start < 16) ) {
+						
+						samp->loop_type = 0;
+						samp->loop_start = 0;
+						samp->loop_end = 0;
+					}
+					
 					// ignore fractional
 					// ignore play count
 					pos += 8;
