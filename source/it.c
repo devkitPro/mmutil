@@ -360,6 +360,18 @@ int Load_IT_SampleData( Sample* samp, u16 cwmt )
 	return 0;
 }
 
+int Empty_IT_Pattern( Pattern *patt ) {
+
+	int x;
+	memset( patt, 0, sizeof( Pattern ) );
+	patt->nrows = 64;
+	for( x = 0; x < patt->nrows*MAX_CHANNELS; x++ ) {
+		patt->data[x].note = 250; // special clears for vol&note
+		patt->data[x].vol = 255;
+	}
+	return ERR_NONE;
+}
+
 int Load_IT_Pattern( Pattern* patt )
 {
 	int x;
@@ -657,7 +669,8 @@ int Load_IT( MAS_Module* itm, bool verbose )
 		}
 		else
 		{
-			memset( &itm->patterns[x], 0, sizeof( Pattern ) );
+			Empty_IT_Pattern( &itm->patterns[x] );
+			//memset( &itm->patterns[x], 0, sizeof( Pattern ) );
 		}
 	}
 	

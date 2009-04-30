@@ -28,9 +28,10 @@
 #include "defs.h"
 #include "mas.h"
 #include "simple.h"
+#include "files.h"
 #include "samplefix.h"
 
-// OMG CREDITS TO CODA, LOOK AT THIS AWESOME COED
+// cREDITS TO CODA, LOOK AT THIS AWESOME CODES
 u32 readbits(u8* buffer, unsigned int pos, unsigned int size) {
 	u32 result=0;
 	u32 i;
@@ -62,6 +63,7 @@ int get_ext( char* filename )
 			break;
 	}
 	//a = tolower( filename[strl-1] ) | (tolower( filename[strl-1] )<<8) | tolower( filename[strl-2]<<16 ) | tolower( filename[strl-3]<<24 );
+	
 	switch( a )
 	{
 	case 'mod':
