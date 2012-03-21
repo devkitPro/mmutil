@@ -55,7 +55,7 @@ int number_of_inputs;
 
 #define USAGE "\n\
 ************************\n\
-* Maxmod Utility v1.8e *\n\
+* Maxmod Utility "PACKAGE_VERSION" *\n\
 ************************\n\
 \n\
 Usage:\n\
