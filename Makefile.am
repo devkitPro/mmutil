@@ -10,4 +10,6 @@ mmutil_SOURCES	=	source/adpcm.c source/adpcm.h source/defs.h source/deftypes.h \
 			source/version.h source/wav.c source/wav.h source/xm.c source/xm.h \
 			source/arm7_st.inc source/arm9_st.inc
 
+mmutil_LDADD	=	-lm
+
 EXTRA_DIST = autogen.sh

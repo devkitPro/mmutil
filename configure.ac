@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([mmutil],[1.8.5],[davem@devkitpro.org])
+AC_INIT([mmutil],[1.8.6],[davem@devkitpro.org])
 AC_CONFIG_SRCDIR([source/adpcm.c])
 
 AM_INIT_AUTOMAKE([1.10])
