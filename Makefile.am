@@ -12,4 +12,6 @@ mmutil_SOURCES	=	source/adpcm.c source/adpcm.h source/defs.h source/deftypes.h \
 
 mmutil_LDADD	=	-lm
 
+mmutil_CPPFLAGS	=	-Wno-multichar
+
 EXTRA_DIST = autogen.sh
