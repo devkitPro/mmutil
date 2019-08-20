@@ -325,7 +325,12 @@ int main(int argc, char* argv[])
 
 	if( m_flag )
 	{
-		
+		if( file_open_read( str_input ) )
+		{
+			printf( "Cannot open %s for reading!\n", str_input );
+			return -1;
+		}
+		input_type = get_ext( str_input );
 
 		switch( input_type )
 		{
