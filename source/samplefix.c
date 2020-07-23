@@ -520,6 +520,10 @@ void FixSample_NDS( Sample* samp )
 
 void FixSample( Sample* samp )
 {
+	// Clamp loop_start and loop_end (f.e. FR_TOWER.MOD)
+	samp->loop_start = CLAMP(samp->loop_start, 0, samp->sample_length);
+	samp->loop_end = CLAMP(samp->loop_end, 0, samp->sample_length);
+
 	if( target_system == SYSTEM_GBA )
 		FixSample_GBA( samp );
 	else if( target_system == SYSTEM_NDS )

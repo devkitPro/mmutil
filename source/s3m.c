@@ -60,6 +60,8 @@ int Load_S3M_SampleData( Sample* samp, u8 ffi )
 {
 	u32 x;
 	int a;
+	if( samp->sample_length == 0 )
+		return ERR_NONE;
 	if( samp->format & SAMPF_16BIT )
 		samp->data = (u16*)malloc( samp->sample_length*2 );
 	else

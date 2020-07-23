@@ -250,6 +250,8 @@ int Load_XM_Instrument( Instrument* inst, MAS_Module* mas, u8* p_nextsample, boo
 		for( x = 0; x < nsamples; x++ )
 		{
 			samp = &mas->samples[ns+x];
+			if( samp->sample_length == 0 )
+				continue;
 			
 			sample_old = 0;
 			if( samp->format & SAMPF_16BIT )

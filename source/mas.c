@@ -28,11 +28,10 @@
 #include "mas.h"
 #include "simple.h"
 #include "systems.h"
-
-#define MAS_VERSION	0x12
+#include "version.h"
 
 u32 MAS_OFFSET;
-u32	MAS_FILESIZE;
+u32 MAS_FILESIZE;
 
 static int CalcEnvelopeSize( Instrument_Envelope* env )
 {
@@ -159,24 +158,98 @@ void Write_Instrument( Instrument* inst )
 	}
 }
 
-void Write_Sample( Sample* samp )
+void Write_SampleData( Sample* samp )
 {
 	u32 x;
-	u32 sample_length;
-	u32 sample_looplen;
+	u32 sample_length = samp->sample_length;
+	u32 sample_looplen = samp->loop_end - samp->loop_start;
+
+	if( target_system == SYSTEM_GBA )
+	{
+		write32( sample_length );
+		write32( samp->loop_type ? sample_looplen : 0xFFFFFFFF );
+		write8( SAMP_FORMAT_U8 );
+		write8( BYTESMASHER );
+		write16( (u16) ((samp->frequency * 1024 + (15768/2)) / 15768) );
+	//	write32( 0);
+	}
+	else
+	{
+		if( samp->format & SAMPF_16BIT )
+		{
+			if( samp->loop_type )
+			{
+				write32( samp->loop_start / 2 );
+				write32( (samp->loop_end-samp->loop_start) / 2 );
+			}
+			else
+			{
+				write32( 0 );
+				write32( sample_length/2 );
+			}
+		}
+		else
+		{
+			if( samp->loop_type )
+			{
+				write32( samp->loop_start / 4 );
+				write32( (samp->loop_end-samp->loop_start) / 4 );
+			}
+			else
+			{
+				write32( 0 );
+				write32( sample_length/4 );
+			}
+		}
+		write8( sample_dsformat( samp ) );
+		write8( sample_dsreptype( samp ) );
+		write16( (u16) ((samp->frequency * 1024 + (32768/2)) / 32768) );
+		write32( 0);
+	}
 	
+	// write sample data
+	if( samp->format & SAMPF_16BIT )
+	{
+		for( x = 0; x < sample_length; x++ )
+			write16( ((u16*)samp->data)[x] );
+
+		// add padding data
+		if( samp->loop_type )
+		{
+			write16( ((u16*)samp->data)[samp->loop_start] );
+			write16( ((u16*)samp->data)[samp->loop_start+1] );
+		}
+		else
+		{
+			write16( 0 );
+			write16( 0 );
+		}
+	}
+	else
+	{
+		for( x = 0; x < sample_length; x++ )
+			write8( ((u8*)samp->data)[x] );
+
+		// add padding data
+		if( samp->loop_type )
+		{
+			write8( ((u8*)samp->data)[samp->loop_start] );
+			write8( ((u8*)samp->data)[samp->loop_start+1] );
+			write8( ((u8*)samp->data)[samp->loop_start+2] );
+			write8( ((u8*)samp->data)[samp->loop_start+3] );
+		}
+		else
+		{
+			for ( x = 0; x < 4; x++ )
+				write8( (target_system == SYSTEM_GBA) ? 128 : 0 );
+		}
+	}
+}
+
+void Write_Sample( Sample* samp )
+{
 	align32(); // align data by 32 bits
 	samp->parapointer = file_tell_write()-MAS_OFFSET;
-	
-	/*write8( samp->global_volume );
-	write8( samp->default_volume );
-	write16( (u16)(samp->frequency/4) );
-	write8( samp->vibtype );
-	write8( samp->vibdepth );
-	write8( samp->vibspeed );
-	write8( samp->default_panning );
-	write16( samp->vibrate );*/
-//	write8( samp->rsamp_index );
 
 	write8( samp->default_volume );
 	write8( samp->default_panning );
@@ -190,118 +263,7 @@ void Write_Sample( Sample* samp )
 	write16( samp->msl_index );
 	
 	if( samp->msl_index == 0xFFFF )
-	{
-		sample_length = samp->sample_length;
-		sample_looplen = samp->loop_end-samp->loop_start;
-		if( target_system == SYSTEM_GBA )
-		{
-			write32( sample_length );
-			write32( samp->loop_type ? sample_looplen : 0xFFFFFFFF );
-			write8( 3 );
-			write8( BYTESMASHER );
-			write16( (u16) ((samp->frequency * 1024 + (15768/2)) / 15768) );
-//			write8( BYTESMASHER );
-//			write8( BYTESMASHER );
-		}
-		else
-		{
-			if( samp->format & SAMPF_16BIT )
-			{
-				if( samp->loop_type )
-				{
-					write32( samp->loop_start / 2 );
-					write32( (samp->loop_end-samp->loop_start) / 2 );
-				}
-				else
-				{
-					int a,b=0;
-					a=sample_length/2;
-					if( a > 65535 )
-					{
-						b = a - 65535;
-						a = 65535;
-					}
-					write32( 0 );
-					write32( sample_length/2 );
-				}
-			}
-			else
-			{
-				if( samp->loop_type )
-				{
-					write32( samp->loop_start / 4 );
-					write32( (samp->loop_end-samp->loop_start) / 4 );
-				}
-				else
-				{
-					int a,b=0;
-					a=sample_length/4;
-					if( a > 65535 )
-					{
-						b = a - 65535;
-						a = 65535;
-					}
-					write32( 0 );
-					write32( sample_length/4 );
-				}
-			}
-			write8( sample_dsformat( samp ) );
-			write8( sample_dsreptype( samp ) );
-			write16( (u16) ((samp->frequency * 1024 + (32768/2)) / 32768) );
-//			write8( BYTESMASHER );
-//			write8( BYTESMASHER );
-		}
-		
-		// write sample data
-		if( samp->format & SAMPF_16BIT )
-		{
-			for( x = 0; x < sample_length; x++ )
-				write16( ((u16*)samp->data)[x] );
-
-			// add padding data
-			if( samp->loop_type )
-			{
-				write16( ((u16*)samp->data)[samp->loop_start] );
-				write16( ((u16*)samp->data)[samp->loop_start+1] );
-			}
-			else
-			{
-				write16( 0 );
-				write16( 0 );
-			}
-		}
-		else
-		{
-			for( x = 0; x < sample_length; x++ )
-				write8( ((u8*)samp->data)[x] );
-
-			// add padding data
-			if( samp->loop_type )
-			{
-				write8( ((u8*)samp->data)[samp->loop_start] );
-				write8( ((u8*)samp->data)[samp->loop_start+1] );
-				write8( ((u8*)samp->data)[samp->loop_start+2] );
-				write8( ((u8*)samp->data)[samp->loop_start+3] );
-			}
-			else
-			{
-				if( target_system == SYSTEM_GBA )
-				{
-					write8( 128 );
-					write8( 128 );
-					write8( 128 );
-					write8( 128 );
-				}
-				else
-				{
-					write8( 0 );
-					write8( 0 );
-					write8( 0 );
-					write8( 0 );
-				}
-			}
-		}
-	}
+		Write_SampleData(samp);
 }
 
 void Write_Pattern( Pattern* patt, bool xm_vol )
@@ -515,6 +477,7 @@ int Write_MAS( MAS_Module* mod, bool verbose, bool msl_dep )
 {
 	// SEE MAS_FORM.TXT
 	int x; //,y;
+	int fpos_pointer;
 //	u8 rsamp=0;
 //	u16 rsamps[200];
 //	bool unique=false;
@@ -522,7 +485,7 @@ int Write_MAS( MAS_Module* mod, bool verbose, bool msl_dep )
 	file_get_byte_count();
 
 	write32( BYTESMASHER );
-	write8( 0 );	// 0=song
+	write8( MAS_TYPE_SONG );
 	write8(	MAS_VERSION );
 	write8( BYTESMASHER );
 	write8( BYTESMASHER );
@@ -582,6 +545,7 @@ int Write_MAS( MAS_Module* mod, bool verbose, bool msl_dep )
 	for( ; x < 200; x++ )
 		write8( 255 );
 	// reserve space for offsets
+	fpos_pointer = file_tell_write();
 	for( x = 0; x < mod->inst_count*4+mod->samp_count*4+mod->patt_count*4; x++ )
 		write8( BYTESMASHER ); // BA BA BLACK SHEEP
 /*	if( msl_dep && target_system == SYSTEM_NDS )
@@ -621,11 +585,13 @@ int Write_MAS( MAS_Module* mod, bool verbose, bool msl_dep )
 	MAS_FILESIZE = file_tell_write() - MAS_OFFSET;
 	file_seek_write( MAS_OFFSET-8, SEEK_SET );
 	write32( MAS_FILESIZE );
-	file_seek_write( 276+MAS_OFFSET, SEEK_SET );
+	file_seek_write( fpos_pointer, SEEK_SET );
 	for( x = 0; x < mod->inst_count; x++ )
 		write32( mod->instruments[x].parapointer );
 	for( x = 0; x < mod->samp_count; x++ )
 	{
+		printf("sample %s is at %d/%d of %d\n", mod->samples[x].name, mod->samples[x].parapointer,
+			file_tell_write(), mod->samples[x].sample_length);
 		write32( mod->samples[x].parapointer );
 	}
 	for( x = 0; x < mod->patt_count; x++ )

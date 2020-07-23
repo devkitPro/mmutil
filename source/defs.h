@@ -25,10 +25,12 @@
 
 #include "deftypes.h"
 
-#define BYTESMASHER			0xBA
+#define BYTESMASHER		0xBA
 #define MAX_CHANNELS		32
 extern int PANNING_SEP;
 
 //#define SUPER_ASCII
+
+#define CLAMP(x, a, b) ((x) < (a) ? (a) : ((x) > (b) ? (b) : (x)))
 
 #endif // _defs_h_

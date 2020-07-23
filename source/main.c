@@ -266,7 +266,7 @@ int main(int argc, char* argv[])
 				}
 				strp = strlen(str_input);
 				str_output = (char*)malloc( strp+2 );
-				memcpy( str_output, str_input, strlen(str_input) );
+				strcpy(str_output, str_input);
 				strp=strlen(str_output)-1;
 				
 				for( strpi=strp; str_output[strpi] != '.' && strpi != 0; strpi-- );
