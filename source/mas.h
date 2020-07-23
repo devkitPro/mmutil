@@ -38,9 +38,9 @@
 #define SAMP_FORMAT_S16		(SAMPF_16BIT | SAMPF_SIGNED )
 #define SAMP_FORMAT_ADPCM	(SAMPF_COMP)
 
-#define MAS_MODE_GBA			0
-#define MAS_MODE_NDS			1
-#define MAS_MODE_NDS_DEP		2
+#define MAS_TYPE_SONG			0
+#define MAS_TYPE_SAMPLE_GBA		1
+#define MAS_TYPE_SAMPLE_NDS		2
 
 typedef struct tInstrument_Envelope
 {
@@ -156,6 +156,7 @@ typedef struct tMAS_Module
 
 void Write_Instrument_Envelope( Instrument_Envelope* env );
 void Write_Instrument( Instrument* inst );
+void Write_SampleData( Sample* samp );
 void Write_Sample( Sample* samp );
 void Write_Pattern( Pattern* patt, bool xm_vol );
 int Write_MAS( MAS_Module* mod, bool verbose, bool msl_dep );

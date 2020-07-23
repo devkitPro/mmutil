@@ -70,131 +70,18 @@ void MSL_Erase( void )
 u16 MSL_AddSample( Sample* samp )
 {
 	u32 sample_length;
-	u32 sample_looplen;
 	u32 x;
 	file_open_write_end( TMP_SAMP );
-	
+
 	sample_length = samp->sample_length;
-	sample_looplen = samp->loop_end-samp->loop_start;
-	
+
 	write32( ((samp->format & SAMPF_16BIT) ? sample_length*2 : sample_length ) + SAMPLE_HEADER_SIZE  +4); // +4 for sample padding
-	if( target_system == SYSTEM_GBA )
-		write8( 1 );
-	else
-		write8( 2 );
+	write8 ( (target_system == SYSTEM_GBA) ? MAS_TYPE_SAMPLE_GBA : MAS_TYPE_SAMPLE_NDS );
 	write8( MAS_VERSION );
-	if( samp->filename[0] == '#' )
-		write8( 1);
-	else
-		write8( 0);
+	write8( samp->filename[0] == '#' ? 1 : 0);
 	write8( BYTESMASHER );
-	
-	if( target_system == SYSTEM_GBA )
-	{
-		write32( sample_length );
-		write32( samp->loop_type ? sample_looplen : 0xFFFFFFFF );
-		write8( SAMP_FORMAT_U8 );//write8( BYTESMASHER );
-		write8( BYTESMASHER );
-		write16( (u16) ((samp->frequency * 1024 + (15768/2)) / 15768) );
-	//	write32( 0);
-	}
-	else
-	{
-		if( (samp->format & SAMPF_16BIT) )
-		{
-			if( samp->loop_type )
-			{
-				write32( samp->loop_start / 2 );
-				write32( (samp->loop_end-samp->loop_start) / 2 );
-			}
-			else
-			{
-				int a,b=0;
-				a=sample_length/2;
-				if( a > 65535 )
-				{
-					b = a - 65535;
-					a = 65535;
-				}
-				write32( 0 );
-				write32( sample_length/2 );
-			}
-		}
-		else
-		{
-			if( samp->loop_type )
-			{
-				write32( samp->loop_start / 4 );
-				write32( (samp->loop_end-samp->loop_start) / 4 );
-			}
-			else
-			{
-				int a,b=0;
-				a=sample_length/4;
-				if( a > 65535 )
-				{
-					b = a - 65535;
-					a = 65535;
-				}
-				write32( 0 );
-				write32( sample_length/4 );
-			}
-		}
-		write8( sample_dsformat( samp ) );
-		write8( sample_dsreptype( samp ) );
-		write16( (u16) ((samp->frequency * 1024 + (32768/2)) / 32768) );
-		write32( 0);
-	}
-	
-	// write sample data
-	if( samp->format & SAMPF_16BIT )
-	{
-		for( x = 0; x < sample_length; x++ )
-			write16( ((u16*)samp->data)[x] );
 
-		// add padding data
-		if( samp->loop_type )
-		{
-			write16( ((u16*)samp->data)[samp->loop_start] );
-			write16( ((u16*)samp->data)[samp->loop_start+1] );
-		}
-		else
-		{
-			write16( 0 );
-			write16( 0 );
-		}
-	}
-	else
-	{
-		for( x = 0; x < sample_length; x++ )
-			write8( ((u8*)samp->data)[x] );
-
-		// add padding data
-		if( samp->loop_type )
-		{
-			write8( ((u8*)samp->data)[samp->loop_start] );
-			write8( ((u8*)samp->data)[samp->loop_start+1] );
-			write8( ((u8*)samp->data)[samp->loop_start+2] );
-			write8( ((u8*)samp->data)[samp->loop_start+3] );
-		}
-		else
-		{
-			if( target_system == SYSTEM_GBA )
-			{
-				write8( 128 );
-				write8( 128 );
-				write8( 128 );
-				write8( 128 );
-			}
-			else
-			{
-				write8( 0 );
-				write8( 0 );
-				write8( 0 );
-				write8( 0 );
-			}
-		}
-	}
+	Write_SampleData(samp);
 
 	file_close_write();
 	MSL_NSAMPS++;

@@ -75,16 +75,19 @@ int Create_MOD_Instrument( Instrument* inst, u8 sample )
 int Load_MOD_SampleData( Sample* samp )
 {
 	u32 t;
-	samp->data = (u8*)malloc( samp->sample_length ); // allocate a SAMPLE_LENGTH sized pointer to buffer in memory and load the sample into it
-	for( t = 0; t < samp->sample_length; t++ )
+	if( samp->sample_length > 0 )
 	{
-		((u8*)samp->data)[t] = read8() + 128; // unsign data
+		samp->data = (u8*)malloc( samp->sample_length ); // allocate a SAMPLE_LENGTH sized pointer to buffer in memory and load the sample into it
+		for( t = 0; t < samp->sample_length; t++ )
+		{
+			((u8*)samp->data)[t] = read8() + 128; // unsign data
+		}
 	}
 	FixSample( samp );
 	return ERR_NONE;
 }
 
-int Load_MOD_Pattern( Pattern* patt, u8 nchannels )
+int Load_MOD_Pattern( Pattern* patt, u8 nchannels, u8* inst_count )
 {
 	u8 data1;
 	u8 data2;
@@ -141,6 +144,12 @@ int Load_MOD_Pattern( Pattern* patt, u8 nchannels )
 			
 			if( period != 0 )						// 0 = no note, otherwise calculate note value from the amiga period
 				p->note = (int)round(12.0*log( (856.0)/(double)period )/log(2)) + 37 + 11;
+			if( *inst_count < (inst + 1) )
+			{
+				*inst_count = (inst + 1);
+				if( *inst_count > 31 )
+					*inst_count = 31;
+			}
 		}
 	}
 	return ERR_NONE;
@@ -298,13 +307,13 @@ int Load_MOD( MAS_Module* mod, bool verbose )
 	mod->global_volume = 64;
 	mod->initial_speed = 6;
 	mod->initial_tempo = 125;
-	mod->inst_count = 31;
+	mod->inst_count = 0; // filled in by Load_MOD_Pattern
 	mod->inst_mode = false;
 	mod->instruments = (Instrument*)malloc( 31 * sizeof( Instrument ) );
 	mod->link_gxx = false;
 	mod->old_effects = true;
 	mod->restart_pos = 0;
-	mod->samp_count = 31;
+	mod->samp_count = 0; // filled in before Load_MOD_SampleData
 	mod->samples = (Sample*)malloc( 31 * sizeof( Sample ) );
 	mod->stereo = true;
 	mod->xm_mode = true;
@@ -325,7 +334,6 @@ int Load_MOD( MAS_Module* mod, bool verbose )
 	{
 	//	if( verbose )
 			//printf( "Loading Sample %i...\n", x+1 );
-	//		printf( "%i	", x+1 );
 		Create_MOD_Instrument( &mod->instruments[x], (u8)x );
 		Load_MOD_Sample( &mod->samples[x], verbose, x );
 	}
@@ -364,7 +372,7 @@ int Load_MOD( MAS_Module* mod, bool verbose )
 		{
 			printf( vstr_mod_pattern, x+1, ((x+1)%15)?"":"\n" );
 		}
-		Load_MOD_Pattern( &mod->patterns[x], (u8)mod_channels );
+		Load_MOD_Pattern( &mod->patterns[x], (u8)mod_channels, &(mod->inst_count) );
 	}
 	if( verbose )
 	{
@@ -374,6 +382,7 @@ int Load_MOD( MAS_Module* mod, bool verbose )
 	// Load Sample Data
 	if( verbose )
 		printf( "Loading Sample Data...\n" );
+	mod->samp_count = mod->inst_count;
 	for( x = 0; x < 31; x++ )
 	{
 		Load_MOD_SampleData( &mod->samples[x] );
