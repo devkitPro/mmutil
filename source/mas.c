@@ -214,7 +214,7 @@ void Write_SampleData( Sample* samp )
 			write16( ((u16*)samp->data)[x] );
 
 		// add padding data
-		if( samp->loop_type )
+		if( samp->loop_type && sample_length >= (samp->loop_start + 2) )
 		{
 			write16( ((u16*)samp->data)[samp->loop_start] );
 			write16( ((u16*)samp->data)[samp->loop_start+1] );
@@ -231,7 +231,7 @@ void Write_SampleData( Sample* samp )
 			write8( ((u8*)samp->data)[x] );
 
 		// add padding data
-		if( samp->loop_type )
+		if( samp->loop_type && sample_length >= (samp->loop_start + 4) )
 		{
 			write8( ((u8*)samp->data)[samp->loop_start] );
 			write8( ((u8*)samp->data)[samp->loop_start+1] );
